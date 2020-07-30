@@ -4,12 +4,11 @@
 # Ubuntu 20.04 (focal)
 # https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
 # OS/ARCH: linux/amd64
-ARG ROOT_CONTAINER=ubuntu:focal-20200703@sha256:d5a6519d9f048100123c568eb83f7ef5bfcad69b01424f420f17c932b00dea76
-
+FROM centos:centos7@sha256:c2f1d5a9c0a81350fa0ad7e1eee99e379d75fe53823d44b5469eb2eb6092c941
+ARG ROOT_CONTAINER=centos:centos7@sha256:c2f1d5a9c0a81350fa0ad7e1eee99e379d75fe53823d44b5469eb2eb6092c941
 ARG BASE_CONTAINER=$ROOT_CONTAINER
-FROM $BASE_CONTAINER
 
-LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
+LABEL maintainer=""
 ARG NB_USER="jovyan"
 ARG NB_UID="1000"
 ARG NB_GID="100"
@@ -21,9 +20,8 @@ USER root
 
 # Install all OS dependencies for notebook server that starts but lacks all
 # features (e.g., download as all possible file formats)
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update \
- && apt-get install -yq --no-install-recommends \
+RUN yum updateinfo \
+ && yum install -y \
     wget \
     bzip2 \
     ca-certificates \
@@ -31,10 +29,9 @@ RUN apt-get update \
     locales \
     fonts-liberation \
     run-one \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+ && yum clean all
 
-RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
-    locale-gen
+RUN localedef -f UTF-8 -i en_US en_US.UTF-8 
 
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
